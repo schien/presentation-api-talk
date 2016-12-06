@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Presentation API</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h2>What is Presentation API?</h2>
+					<p>
+						to allow web page to utilize secondary screen
+					</p>
+          <p>
+						from javascript
+          </p>
+				</section>
+				<section>
+					<h2>Standardization Progress</h2>
+					<p>
+						<ul>
+							<li><a href="https://www.w3.org/2014/secondscreen/charter.html">By W3C second screen WG</a></li>
+							<li><a href="https://www.w3.org/TR/presentation-api/">A candidate recommandation</a></li>
+						</ul>
+					</p>
+				</section>
+				<section>
+					<h2>Who support this?</h2>
+					<p>
+						<ul>
+							<li>Mozilla
+								<ul>
+									<li>Fennec Nightly since release 53</li>
+									<li>Cast to Google Chromecast</li>
+								</ul>
+							</li>
+							<li>Google
+								<ul>
+									<li><a href="https://www.chromestatus.com/feature/6676265876586496">Google Chrome desktop 51 and android 48</a></li>
+									<li>Connect to Google Chromecast application</li>
+                </ul>
+							</li>
+						</ul>
+					</p>
+				</section>
+				<section>
+					<h2>How to use this API?</h2>
+					<p>
+						Simply request for starting a presentation
+					</p>
+					<pre><code class="js">
+// in primary.html
+var request = new Presentation('secondary.html');
+request.start().then(function(connection) {
+  connection.onconnect = function() {
+    // presentation launched successfully
+  };
+});
+					</code></pre>
+				</section>
+				<section>
+					<h2>Interaction between screens</h2>
+          <p>
+            Define your own command
+          </p>
+          <p>
+            Send via message-based channel
+          </p>
+          <pre><code class="js">
+// in primary.html
+nextBtn.onclick = function() {
+  connection.send('next');
+};
+
+// in secondary.html
+navigator.presentation.receiver.connectionList
+.then(function(connList) {
+  var connection = connList.connections[0];
+  connection.onmessage = function(evt) {
+    if (evt.data === 'next') {
+      slideShow.next();
+    }
+  };
+});
+          </code><pre>
+				</section>
+        <section>
+          <h2>How does it work on Fennec?</h2>
+          <p>
+            <ul>
+              <li>Leverage Remote Display API on Android</li>
+              <li>Open presenting page in a background window</li>
+            </ul>
+          </p>
+          <img src="1-ua-illustration.svg"></img>
+        </section>
+				<section>
+					<h2>Future Works</h2>
+					<p>
+						<ul>
+							<li>Interoperability
+								<ul>
+									<li>Protocol discussion via W3C second screen CG</li>
+								</ul>
+							</li>
+              <li>Support on Firefox desktop
+                <ul>
+                  <li>Enable interaction between Firefox and Fennec</li>
+                </ul>
+              </li>
+              <li>Support Many-to-one session
+                <ul>
+                  <li>Enable multiplayer game</li>
+                </ul>
+              </li>
+						</ul>
+					</p>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/remote-control/receiver.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>

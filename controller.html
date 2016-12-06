@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Presentation Controller</title>
+
+		<link rel="stylesheet" href="css/theme/black.css">
+		<style>
+			body {
+				font-family: Helvetica;
+			}
+
+			#speaker-controls-nav {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 20%;
+				overflow: auto;
+
+				font-size: 18px;
+			}
+        #speaker-controls-nav .control-prev {
+          position: absolute;
+          left: 35%;
+          width: 10%;
+          height: 100%;
+        }
+        #speaker-controls-nav .control-start {
+          position: absolute;
+          left: 45%;
+          width: 10%;
+          height: 100%;
+        }
+        #speaker-controls-nav .control-stop {
+          position: absolute;
+          left:45%;
+          width: 10%;
+          height: 100%;
+        }
+        #speaker-controls-nav .control-next {
+          position: absolute;
+          right: 35%;
+          width: 10%;
+          height: 100%;
+        }
+
+			#speaker-controls {
+				position: absolute;
+				top: 20%;
+				left: 0;
+				width: 100%;
+				height: 80%;
+				overflow: auto;
+
+				font-size: 18px;
+			}
+
+				.hidden {
+					display: none;
+				}
+				.speaker-controls-notes .label {
+					text-transform: uppercase;
+					font-weight: normal;
+					font-size: 0.66em;
+					color: #666;
+					margin: 0;
+				}
+				.speaker-controls-notes {
+					padding: 10px 16px;
+				}
+
+				.speaker-controls-notes .value {
+					margin-top: 5px;
+					line-height: 1.4;
+					font-size: 1.2em;
+				}
+
+			@media screen and (max-width: 1080px) {
+				#speaker-controls {
+					font-size: 16px;
+				}
+			}
+
+			@media screen and (max-width: 900px) {
+				#speaker-controls {
+					font-size: 14px;
+				}
+			}
+
+			@media screen and (max-width: 800px) {
+				#speaker-controls {
+					font-size: 12px;
+				}
+			}
+
+		</style>
+  </head>
+  <body>
+    <div id="speaker-controls-nav">
+      <button class="control-prev" disabled>Previous</button>
+      <button class="control-start">Start Presentation</button>
+      <button class="control-stop hidden">Stop Presentation</button>
+      <button class="control-next" disabled>Next</button>
+    </div>
+		<div id="speaker-controls">
+			<div class="speaker-controls-notes hidden">
+				<h4 class="label">Notes</h4>
+				<div class="value"></div>
+			</div>
+		</div>
+    <script src="../../plugin/markdown/marked.js"></script>
+    <script>
+      window.addEventListener('load', function() {
+        var startBtn = document.querySelector('.control-start');
+        var stopBtn = document.querySelector('.control-stop');
+        var prevBtn = document.querySelector('.control-prev');
+        var nextBtn = document.querySelector('.control-next');
+
+        function onStatusChange(currentState) {
+					// No need for updating the notes in case of fragment changes
+					if ( data.notes ) {
+						notes.classList.remove( 'hidden' );
+						notesValue.style.whiteSpace = data.whitespace;
+						if( data.markdown ) {
+							notesValue.innerHTML = marked( data.notes );
+						}
+						else {
+							notesValue.innerHTML = data.notes;
+						}
+					}
+					else {
+						notes.classList.add( 'hidden' );
+					}
+        }
+
+        function onCommand(cmd) {
+          switch(cmd.type) {
+            case 'status':
+              onStatusChange(cmd.data);
+              break;
+            default:
+              console.warn('unknown controller msg: ' + JSON.stringify(cmd));
+              return;
+          }
+        }
+
+        var req = new PresentationRequest('/index.html');
+        var conn;
+        startBtn.addEventListener('click', function() {
+          req.start().then(function(connection) {
+            console.log('presentation starts');
+            conn = connection;
+
+            conn.addEventListener('message', function(e) {
+              console.log('controller on message: ' + e.data);
+              var cmd = JSON.parse(e.data);
+              onCommand(cmd);
+            });
+
+            function onConnected() {
+              if (connection.state !== 'connected') {
+                return;
+              }
+
+              prevBtn.disabled = false;
+              nextBtn.disabled = false;
+              startBtn.classList.add('hidden');
+              stopBtn.classList.remove('hidden');
+            }
+
+            onConnected();
+            if (connection.state !== 'connected') {
+              conn.addEventListener('statechange', onConnected);
+            }
+          }).catch(function(e) {
+            console.error('fail to start presentation: ' + e);
+          })
+        });
+
+        function sendCommand(cmd) {
+          if (!conn) {
+            console.warn('connection is not ready');
+            return;
+          }
+
+          conn.send(JSON.stringify(msg));
+        }
+
+        prevBtn.addEventListener('click', function() {
+          sendCommand({
+            type: 'prev',
+          });
+        });
+
+        nextBtn.addEventListener('click', function() {
+          sendCommand({
+            type: 'next',
+          })
+        })
+      });
+    </script>
+  </body>
+</html>
