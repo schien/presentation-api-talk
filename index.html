@@ -55,7 +55,7 @@
 							<li>Google
 								<ul>
 									<li><a href="https://www.chromestatus.com/feature/6676265876586496">Google Chrome desktop 51 and android 48</a></li>
-									<li>Connect to Google Chromecast application</li>
+									<li>Connect to Google Chromecast application and DIAL application</li>
                 </ul>
 							</li>
 						</ul>
@@ -68,7 +68,7 @@
 					</p>
 					<pre><code class="js">
 // in primary.html
-var request = new Presentation('secondary.html');
+var request = new PresentationRequest('secondary.html');
 request.start().then(function(connection) {
   connection.onconnect = function() {
     // presentation launched successfully
