@@ -9,7 +9,7 @@ var RemoteControl = (function() {
       },
       get onmessage() {
         return this._callback;
-      }
+      },
       send: function(msg) {
         window.opener.postMessage(msg, '*');
       }
