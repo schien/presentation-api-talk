@@ -89,6 +89,8 @@ var RemoteControl = (function() {
       var cmd = JSON.parse(event.data);
       onCommand(cmd);
     });
+    Reveal.configure({ controls: false,
+                       history: false });
     post();
   }).catch(function(e) {
     console.error('reciever init error: ' + e);
