@@ -154,8 +154,11 @@
                 }
                 _recvWin.postMessage(msg, '*');
               },
-              onmessage: function(callback) {
+              set onmessage(callback) {
                 this._callback = callback;
+              },
+              get onmessage() {
+                return this._callback;
               }
             }
             conn._state = 'connected';
@@ -210,11 +213,11 @@
             conn = connection;
 
 //            conn.addEventListener('message', function(e) {
-            conn.onmessage(function(e) {
+            conn.onmessage = function(e) {
               console.log('controller on message: ' + e.data);
               var cmd = JSON.parse(e.data);
               onCommand(cmd);
-            });
+            };
 
             function onConnected() {
               if (connection.state !== 'connected') {

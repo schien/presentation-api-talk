@@ -4,9 +4,12 @@ var RemoteControl = (function() {
 //    return {};
     var conn = {
       get state() { return this._state; },
-      onmessage: function(callback) {
+      set onmessage(callback) {
         this._callback = callback;
       },
+      get onmessage() {
+        return this._callback;
+      }
       send: function(msg) {
         window.opener.postMessage(msg, '*');
       }
@@ -84,11 +87,11 @@ var RemoteControl = (function() {
   .then(function(connList) {
     conn = connList.connections[0];
 //    conn.addEventListener('message', function(event) {
-    conn.onmessage(function(event) {
+    conn.onmessage = function(event) {
       console.log('on message: ' + event.data);
       var cmd = JSON.parse(event.data);
       onCommand(cmd);
-    });
+    };
     Reveal.configure({ controls: false,
                        history: false });
     post();
