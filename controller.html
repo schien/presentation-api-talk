@@ -232,7 +232,7 @@
 
             onConnected();
             if (connection.state !== 'connected') {
-              conn.addEventListener('statechange', onConnected);
+              conn.addEventListener('connect', onConnected);
             }
           }).catch(function(e) {
             console.error('fail to start presentation: ' + e);
