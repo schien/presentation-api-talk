@@ -65,7 +65,12 @@ var RemoteControl = (function() {
       data: messageData,
     }
 
-    conn.send(JSON.stringify(msg));
+    try {
+      console.log('receiver send status');
+      conn.send(JSON.stringify(msg));
+    }catch(e){
+      console.error('receiver send error: ' + e);
+    }
   }
 
   function onCommand(cmd) {
@@ -87,6 +92,7 @@ var RemoteControl = (function() {
   .then(function(connList) {
     conn = connList.connections[0];
 //    conn.addEventListener('message', function(event) {
+    console.log('receiver - conn state:' + conn.state);
     conn.onmessage = function(event) {
       console.log('on message: ' + event.data);
       var cmd = JSON.parse(event.data);
@@ -95,6 +101,9 @@ var RemoteControl = (function() {
     Reveal.configure({ controls: false,
                        history: false });
     post();
+    if (conn.state !== 'connected') {
+      conn.addEventListener('connect', post);
+    }
   }).catch(function(e) {
     console.error('reciever init error: ' + e);
   });
