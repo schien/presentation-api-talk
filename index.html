@@ -38,6 +38,9 @@
           <p>
 						from javascript
           </p>
+          <aside class="notes">
+            works as an extended screen instead of just mirroring
+          </aside>
 				</section>
 				<section>
 					<h2>Standardization Progress</h2>
@@ -47,6 +50,16 @@
 							<li><a href="https://www.w3.org/TR/presentation-api/">A candidate recommandation</a></li>
 						</ul>
 					</p>
+          <aside class="notes">
+            <ul>
+              <li>
+                Standardization is developed in W3C second screen working group and is currently a cadidate recommandation.
+              </li>
+              <li>
+                The working group is aiming to release this spec as a recommandation next year.
+              </li>
+            </ul>
+          </aside>
 				</section>
 				<section>
 					<h2>Who support this?</h2>
@@ -55,7 +68,7 @@
 							<li>Mozilla
 								<ul>
 									<li>Fennec Nightly since release 53</li>
-									<li>Cast to Google Chromecast</li>
+									<li>Use Google Chromecast as an extended screen</li>
 								</ul>
 							</li>
 							<li>Google
@@ -66,6 +79,19 @@
 							</li>
 						</ul>
 					</p>
+          <aside class="notes">
+            <ul>
+              <li>
+                Two browsers are supporting this API.
+              </li>
+              <li>
+                In Fennec we have default enabled it on Fennec nightly recently, which uses Chromecast dongle as an extended screen.
+              </li>
+              <li>
+                For Google they've release this API on both desktop and android browser, for connecting to their chromecast apps and DIAL apps on smart TV.
+              </li>
+            </ul>
+          </aside>
 				</section>
 				<section>
 					<h2>How to use this API?</h2>
@@ -81,6 +107,22 @@ request.start().then(function(connection) {
   };
 });
 					</code></pre>
+          <p>
+            Browser provides a device selection UI.<br/>
+            Web page cannot get the list of available devices.
+          </p>
+          <aside class="notes">
+            <ul>
+              <li>
+                Using this API is pretty straightforward, simply request to launch a presentation session to a presentation page.
+              </li>
+              <li>
+                Browser will pop-up a list of available devices for user to pick.
+              </li>
+              <li>
+                Web page will not know which device user picked and cannot probing what devices you have in the environment.
+              </li>
+            </ul>
 				</section>
 				<section>
 					<h2>Interaction between screens</h2>
@@ -107,6 +149,16 @@ navigator.presentation.receiver.connectionList
   };
 });
           </code><pre>
+          <aside class="notes">
+            <ul>
+              <li>
+                After lauching the presentation successfully, a connection is provided to the web page for communicating between controller page and presenting page.
+              </li>
+              <li>
+                Web page can create their own protocol for their use case.
+              </li>
+            </ul>
+          </aside>
 				</section>
         <section>
           <h2>How does it work on Fennec?</h2>
@@ -117,6 +169,22 @@ navigator.presentation.receiver.connectionList
             </ul>
           </p>
           <img src="1-ua-illustration.svg"></img>
+          <aside class="notes">
+            <ul>
+              <li>
+                Here is the illustration of how it works on Fennec.
+              </li>
+              <li>
+                On Fennec we leverage the remote display API provided by Android SDK.
+              </li>
+              <li>
+                Gecko will open the presentation page in a background window, which rendered to a separate rendering buffer.
+              </li>
+              <li>
+                Android will stream the rendering result as a video stream to chromecast
+              </li>
+            </ul>
+          </aside>
         </section>
 				<section>
 					<h2>Future Works</h2>
@@ -139,7 +207,29 @@ navigator.presentation.receiver.connectionList
               </li>
 						</ul>
 					</p>
+          <aside class="notes">
+            <ul>
+              <li>
+                There is a separate discussion for an open presentation control protocol initiated by w3c second screen community group.
+              </li>
+            </ul>
+          </aside>
 				</section>
+        <section>
+          <h2>Acknowledgments</h2>
+          <p>
+            Aaron Wu,
+            Chun-Min Chang,
+            Cynthia Tang,
+            Gary Chen,
+            Jim Chen,
+            Junior Hsu,
+            Kershaw Chang,
+            Olli Patty,
+            Tommy Kuo,
+            Tori Chen
+          </p>
+        </section>
 			</div>
 		</div>
 
