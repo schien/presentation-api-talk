@@ -131,7 +131,7 @@
     <script>
       if (!window.PresentationRequest) {
         function PresentationRequest(url) {
-          var longUrl = window.location.href.slice(0, window.location.href.lastIndexOf('/')) + url;
+          var longUrl = window.location.href.slice(0, window.location.href.lastIndexOf('/')) + '/' + url;
           this._url = longUrl;
         }
         PresentationRequest.prototype = {
@@ -205,7 +205,7 @@
           }
         }
 
-        var req = new PresentationRequest('/index.html');
+        var req = new PresentationRequest('index.html');
         var conn;
         startBtn.addEventListener('click', function() {
           req.start().then(function(connection) {
