@@ -1,7 +1,31 @@
 var RemoteControl = (function() {
   if (!navigator.presentation || ! navigator.presentation.receiver) {
-    console.warn('not in receiver window');
-    return {};
+//    console.warn('not in receiver window');
+//    return {};
+    var conn = {
+      get state() { return this._state; },
+      onmessage: function(callback) {
+        this._callback = callback;
+      },
+      send: function(msg) {
+        window.opener.postMessage(msg, '*');
+      }
+    };
+
+    window.addEventListener('message', function(e) {
+      conn._callback(e);
+    });
+    navigator.presentation = {
+      receiver: {
+        get connectionList() {
+          return Promise.resolve({
+            get connections() {
+              return [conn];
+            },
+          })
+        }
+      }
+    };
   }
 
   var conn;
@@ -56,10 +80,11 @@ var RemoteControl = (function() {
     post();
   }
 
-  navigator.presentation.reciever.connectionList
+  navigator.presentation.receiver.connectionList
   .then(function(connList) {
     conn = connList.connections[0];
-    conn.addEventListener('message', function(event) {
+//    conn.addEventListener('message', function(event) {
+    conn.onmessage(function(event) {
       console.log('on message: ' + event.data);
       var cmd = JSON.parse(event.data);
       onCommand(cmd);

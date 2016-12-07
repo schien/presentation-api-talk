@@ -20,31 +20,35 @@
 				height: 20%;
 				overflow: auto;
 
-				font-size: 18px;
+				font-size: 2rem;
 			}
         #speaker-controls-nav .control-prev {
           position: absolute;
           left: 35%;
           width: 10%;
           height: 100%;
+          font-size: inherit;
         }
         #speaker-controls-nav .control-start {
           position: absolute;
           left: 45%;
           width: 10%;
           height: 100%;
+          font-size: inherit;
         }
         #speaker-controls-nav .control-stop {
           position: absolute;
           left:45%;
           width: 10%;
           height: 100%;
+          font-size: inherit;
         }
         #speaker-controls-nav .control-next {
           position: absolute;
           right: 35%;
           width: 10%;
           height: 100%;
+          font-size: inherit;
         }
 
 			#speaker-controls {
@@ -100,10 +104,10 @@
   </head>
   <body>
     <div id="speaker-controls-nav">
-      <button class="control-prev" disabled>Previous</button>
-      <button class="control-start">Start Presentation</button>
-      <button class="control-stop hidden">Stop Presentation</button>
-      <button class="control-next" disabled>Next</button>
+      <button class="control-prev" disabled>&LeftTriangleBar;</button>
+      <button class="control-start">&blacktriangleright;</button>
+      <button class="control-stop hidden">&FilledSmallSquare;</button>
+      <button class="control-next" disabled>&RightTriangleBar;</button>
     </div>
 		<div id="speaker-controls">
 			<div class="speaker-controls-notes hidden">
@@ -113,13 +117,51 @@
 		</div>
     <script src="../../plugin/markdown/marked.js"></script>
     <script>
+      if (!window.PresentationRequest) {
+        function PresentationRequest(url) {
+          this._url = url;
+        }
+        PresentationRequest.prototype = {
+          start: function() {
+            var _recvWin = window.open(this._url);
+            var conn = {
+              get state() {
+                return this._state;
+              },
+              terminate: function() {
+                if (!_recvWin) {
+                  return;
+                }
+                _recvWin.close();
+                _recvWin = null;
+              },
+              send: function(msg) {
+                if (!_recvWin) {
+                  return;
+                }
+                _recvWin.postMessage(msg, '*');
+              },
+              onmessage: function(callback) {
+                this._callback = callback;
+              }
+            }
+            conn._state = 'connected';
+            window.addEventListener('message', function(e) {
+              conn._callback(e);
+            });
+            return Promise.resolve(conn);
+          },
+        };
+      }
       window.addEventListener('load', function() {
         var startBtn = document.querySelector('.control-start');
         var stopBtn = document.querySelector('.control-stop');
         var prevBtn = document.querySelector('.control-prev');
         var nextBtn = document.querySelector('.control-next');
+        var notes = document.querySelector( '.speaker-controls-notes' );
+        var notesValue = document.querySelector( '.speaker-controls-notes .value' );
 
-        function onStatusChange(currentState) {
+        function onStatusChange(data) {
 					// No need for updating the notes in case of fragment changes
 					if ( data.notes ) {
 						notes.classList.remove( 'hidden' );
@@ -147,14 +189,16 @@
           }
         }
 
-        var req = new PresentationRequest('/index.html');
+//        var req = new PresentationRequest('/index.html');
+        var req = new PresentationRequest('file:///Users/hellfire/workspace/etc/presentation-api-talk/index.html');
         var conn;
         startBtn.addEventListener('click', function() {
           req.start().then(function(connection) {
             console.log('presentation starts');
             conn = connection;
 
-            conn.addEventListener('message', function(e) {
+//            conn.addEventListener('message', function(e) {
+            conn.onmessage(function(e) {
               console.log('controller on message: ' + e.data);
               var cmd = JSON.parse(e.data);
               onCommand(cmd);
@@ -180,7 +224,19 @@
           })
         });
 
-        function sendCommand(cmd) {
+        stopBtn.addEventListener('click', function() {
+          if (!conn) {
+            return;
+          }
+          conn.terminate();
+          conn = null;
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+          startBtn.classList.remove('hidden');
+          stopBtn.classList.add('hidden');
+        })
+
+        function sendCommand(msg) {
           if (!conn) {
             console.warn('connection is not ready');
             return;
