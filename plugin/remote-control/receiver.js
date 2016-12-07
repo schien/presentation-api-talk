@@ -3,7 +3,7 @@ var RemoteControl = (function() {
 //    console.warn('not in receiver window');
 //    return {};
     var conn = {
-      get state() { return this._state; },
+      get state() { return 'connected'; },
       set onmessage(callback) {
         this._callback = callback;
       },
@@ -88,6 +88,7 @@ var RemoteControl = (function() {
     post();
   }
 
+  console.log('reciever init connetion');
   navigator.presentation.receiver.connectionList
   .then(function(connList) {
     conn = connList.connections[0];
